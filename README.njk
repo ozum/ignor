@@ -1,0 +1,37 @@
+{% include "module-header" %}
+
+# Synopsis
+
+```ts
+import * as ignore from "ignor";
+
+await got(url).catch(ignore.code("ECONNREFUSED", "default value"));
+```
+
+## Other Usage
+
+```ts
+// Ignore an error with a code and return undefined. Otherwise throw error.
+ignore.code("ECONNREFUSED");
+
+// Ignore an error with a code and return default value.
+ignore.code("ECONNREFUSED", "no content");
+
+// Ignore an error with multiple codes.
+ignore.code(["ENOTDIR", "ENOENT"]);
+
+// Ignore an error with a message.
+ignore.message(/cannot connect/);
+
+// Ignore an error with a status.
+ignore.status(404);
+```
+
+
+<!-- usage -->
+
+<!-- commands -->
+
+# API
+
+{% include "api.md" %}
