@@ -1,7 +1,7 @@
 {
   "name": "ignor",
   "version": "1.0.0",
-  "description": "Ignore errors conditionally in async / promise functions and return a default value.",
+  "description": "Ignore errors conditionally in sync / async / promise functions and return a default value.",
   "author": {
     "name": "Özüm Eldoğan",
     "email": "ozum@ozum.net",
@@ -12,6 +12,7 @@
     "errors",
     "conditionally",
     "promise",
+    "sync",
     "async",
     "catch"
   ],

@@ -1,1 +1,1 @@
-export { code, message, status } from "./ignore";
+export { ignoreCode, ignoreMessage, ignoreStatus } from "./ignore";

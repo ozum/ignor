@@ -1,20 +1,42 @@
-import { ignorer } from "./ignorer";
-import { Multi } from "./types";
+import { ignoreAttribute } from "./ignorer";
+import type { Multi, Ignore, Fn, Result } from "./types";
 
 /**
- * Converts it's input to an array.
- * - Arrays are returned as is.
- * - `undefined` are returned as an empty array.
- * - Non-aray values are returned as a single element array.
+ * Ignores errors with the given code in sync functions.
  *
- * @param input is the input to convert to array.
- * @returns input converted to an array.
+ * @param ignore is the code or codes to ignore.
+ * @param fn is the function to execute and ignore some of the errors.
+ * @returns `undefined`.
+ *
+ * @typeParam R is the return type of the executed function.
+ *
+ * @thorws if error is not one of the ignored codes.
+ *
+ * @example
+ * import * as ignore from "ignor";
+ * ignore.code("ENOENT", () => readFileSync("file.txt"));
+ * ignore.code(["ENOENT", "OTHER"], () => readFileSync("file.txt"));
  */
-function arrify<T extends any>(input?: T | T[]): T[] {
-  if (input === undefined) return [];
-  return Array.isArray(input) ? input : [input];
-}
-
+export function ignoreCode<R>(ignore: Multi<Ignore> | undefined, fn: (...args: any[]) => R): undefined | R;
+/**
+ * Ignores errors with the given code in sync functions.
+ *
+ * @param ignore is the code or codes to ignore.
+ * @param defaultValue is the default value to return if an error is ignored.
+ * @param fn is the function to execute and ignore some of the errors.
+ * @returns `undefined`.
+ *
+ * @typeParam D is the type of returned default value if an error is ignored.
+ * @typeParam R is the return type of the executed function.
+ *
+ * @thorws if error is not one of the ignored codes.
+ *
+ * @example
+ * import * as ignore from "ignor";
+ * ignore.code("ENOENT", "default", () => readFileSync("file.txt"));
+ * ignore.code(["ENOENT", "OTHER"], "default", () => readFileSync("file.txt"));
+ */
+export function ignoreCode<D, R>(ignore: Multi<Ignore> | undefined, defaultValue: D, fn: (...args: any[]) => R): D | R;
 /**
  * Ignores errors with the given code in async functions.
  *
@@ -28,13 +50,15 @@ function arrify<T extends any>(input?: T | T[]): T[] {
  * await got(url).catch(ignore.code("ECONNREFUSED"));
  * await got(url).catch(ignore.code(["ECONNREFUSED", "OTHER"]));
  */
-export function code(ignore?: Multi<string | number | RegExp>): (e: Error) => undefined;
+export function ignoreCode(ignore?: Multi<Ignore>): (e: Error) => undefined;
 /**
  * Ignores errors with the given code in async functions.
  *
  * @param ignore is the code or codes to ignore.
  * @param defaultValue is the default value to return if an error is ignored.
  * @returns default value.
+ *
+ * @typeParam D is the type of returned default value if an error is ignored.
  *
  * @thorws if error is not one of the ignored codes.
  *
@@ -43,73 +67,23 @@ export function code(ignore?: Multi<string | number | RegExp>): (e: Error) => un
  * await got(url).catch(ignore.code("ECONNREFUSED", []));
  * await got(url).catch(ignore.code(["ECONNREFUSED", "OTHER"], []));
  */
-export function code<T extends any>(ignore: Multi<string | number | RegExp> | undefined, defaultValue: T): (e: Error) => T;
-export function code<T extends any>(ignore?: Multi<string | number | RegExp>, defaultValue?: T): (e: Error) => T | undefined {
-  return ignorer("code", arrify(ignore), defaultValue);
+export function ignoreCode<D>(ignore: Multi<Ignore> | undefined, defaultValue: D): (e: Error) => D;
+export function ignoreCode<D, R>(ignore?: Multi<Ignore>, defaultOrFn?: D | Fn<R>, maybeFn?: Fn<R>): Result<D, R> {
+  return ignoreAttribute("code", ignore, defaultOrFn, maybeFn);
 }
 
-/**
- * Ignores errors with the given message in async functions.
- *
- * @param ignore is the message or messages to ignore.
- * @returns `undefined`.
- *
- * @thorws if error is not one of the ignored messages.
- *
- * @example
- * import * as ignore from "ignor";
- * await got(url).catch(ignore.message(/cannot connect/));
- * await got(url).catch(ignore.message([/cannot connect/, "OTHER"]));
- */
-export function message(ignore?: Multi<string | number | RegExp>): (e: Error) => undefined;
-/**
- * Ignores errors with given message in async functions.
- *
- * @param ignore is the message or messages to ignore.
- * @param defaultValue is the default value to return if an error is ignored.
- * @returns default value.
- *
- * @thorws if error is not one of the ignored messages.
- *
- * @example
- * import * as ignore from "ignor";
- * await got(url).catch(ignore.message(/cannot connect/, "default value"));
- * await got(url).catch(ignore.message([/cannot connect/, "OTHER"], "default value"));
- */
-export function message<T extends any>(ignore: Multi<string | number | RegExp> | undefined, defaultValue: T): (e: Error) => T;
-export function message<T extends any>(ignore?: Multi<string | number | RegExp>, defaultValue?: T): (e: Error) => T | undefined {
-  return ignorer("message", arrify(ignore), defaultValue);
+export function ignoreMessage<R>(ignore: Multi<Ignore> | undefined, fn: (...args: any[]) => R): undefined | R;
+export function ignoreMessage<D, R>(ignore: Multi<Ignore> | undefined, defaultValue: D, fn: (...args: any[]) => R): D | R;
+export function ignoreMessage(ignore?: Multi<Ignore>): (e: Error) => undefined;
+export function ignoreMessage<D>(ignore: Multi<Ignore> | undefined, defaultValue: D): (e: Error) => D;
+export function ignoreMessage<D, R>(ignore?: Multi<Ignore>, defaultOrFn?: D | Fn<R>, maybeFn?: Fn<R>): Result<D, R> {
+  return ignoreAttribute("message", ignore, defaultOrFn, maybeFn);
 }
 
-/**
- * Ignores errors with the given status in async functions.
- *
- * @param ignore is the status or statusses to ignore.
- * @returns `undefined`.
- *
- * @thorws if error is not one of the ignored statusses.
- *
- * @example
- * import * as ignore from "ignor";
- * await got(url).catch(ignore.status(404));
- * await got(url).catch(ignore.status([404, 403]));
- */
-export function status(ignore?: Multi<string | number | RegExp>): (e: Error) => undefined;
-/**
- * Ignores errors with given status in async functions.
- *
- * @param ignore is the status or statusses to ignore.
- * @param defaultValue is the default value to return if an error is ignored.
- * @returns default value.
- *
- * @thorws if error is not one of the ignored statusses.
- *
- * @example
- * import * as ignore from "ignor";
- * await got(url).catch(ignore.status(404, "default value"));
- * await got(url).catch(ignore.status([404, 403], "default value"));
- */
-export function status<T extends any>(ignore: Multi<string | number | RegExp> | undefined, defaultValue: T): (e: Error) => T;
-export function status<T extends any>(ignore?: Multi<string | number | RegExp>, defaultValue?: T): (e: Error) => T | undefined {
-  return ignorer("status", arrify(ignore), defaultValue);
+export function ignoreStatus<R>(ignore: Multi<Ignore> | undefined, fn: (...args: any[]) => R): undefined | R;
+export function ignoreStatus<D, R>(ignore: Multi<Ignore> | undefined, defaultValue: D, fn: (...args: any[]) => R): D | R;
+export function ignoreStatus(ignore?: Multi<Ignore>): (e: Error) => undefined;
+export function ignoreStatus<D>(ignore: Multi<Ignore> | undefined, defaultValue: D): (e: Error) => D;
+export function ignoreStatus<D, R>(ignore?: Multi<Ignore>, defaultOrFn?: D | Fn<R>, maybeFn?: Fn<R>): Result<D, R> {
+  return ignoreAttribute("status", ignore, defaultOrFn, maybeFn);
 }

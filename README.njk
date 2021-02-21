@@ -3,30 +3,55 @@
 # Synopsis
 
 ```ts
-import * as ignore from "ignor";
+import { ignoreCode } from "ignor";
 
-await got(url).catch(ignore.code("ECONNREFUSED", "default value"));
+// Async: Returns "default value" if thrown error code is "ECONNREFUSED", otherwise throws.
+await got(url).catch(ignoreCode("ECONNREFUSED", "default value"));
+
+// Sync: Returns "default value" if thrown error code is "ENOENT", otherwise throws.
+ignoreCode("ENOENT", "default value", () => readFileSync("x.txt"));
 ```
 
-## Other Usage
+# Async
 
 ```ts
 // Ignore an error with a code and return undefined. Otherwise throw error.
-ignore.code("ECONNREFUSED");
+await got(url).catch(ignoreCode("ECONNREFUSED"));
 
 // Ignore an error with a code and return default value.
-ignore.code("ECONNREFUSED", "no content");
+await got(url).catch(ignoreCode("ECONNREFUSED", "no content"));
 
 // Ignore an error with multiple codes.
-ignore.code(["ENOTDIR", "ENOENT"]);
+await got(url).catch(ignoreCode(["ENOTDIR", "ENOENT"]));
 
 // Ignore an error with a message.
-ignore.message(/cannot connect/);
+await got(url).catch(ignoreMessage(/cannot connect/));
 
 // Ignore an error with a status.
-ignore.status(404);
+await got(url).catch(ignoreStatus(404));
 ```
 
+# Sync
+
+```ts
+// An example sync function.
+const func = () => readFileSync("x.txt");
+
+// Ignore an error with a code and return undefined. Otherwise throw error.
+ignore.code("ENOENT", func);
+
+// Ignore an error with a code and return default value.
+ignore.code("ENOENT", "no content", func);
+
+// Ignore an error with multiple codes.
+ignore.code(["ENOTDIR", "ENOENT"], func);
+
+// Ignore an error with a message.
+ignore.message(/cannot connect/, func);
+
+// Ignore an error with a status.
+ignore.status(404, func);
+```
 
 <!-- usage -->
 
