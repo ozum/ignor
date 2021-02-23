@@ -8,6 +8,9 @@ import { ignoreCode } from "ignor";
 // Async: Returns "default value" if thrown error code is "ECONNREFUSED", otherwise throws.
 await got(url).catch(ignoreCode("ECONNREFUSED", "default value"));
 
+// AggregateError: Returns "default value" if all errors of an aggregate error are ignored.
+await Promise.any([got(url), got(url)]).catch(ignoreCode("ECONNREFUSED", "default value"));
+
 // Sync: Returns "default value" if thrown error code is "ENOENT", otherwise throws.
 ignoreCode("ENOENT", "default value", () => readFileSync("x.txt"));
 ```

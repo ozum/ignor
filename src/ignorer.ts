@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import memoize from "fast-memoize";
 import type { Multi, Ignore, Fn, Result } from "./types";
 
@@ -94,7 +95,9 @@ function _ignorer<T>(attribute: string, ignores: Array<Ignore>, defaultValue?: T
 
   // Return a function which returns default value if error attribute matches one of the ignored values, throws otherwise.
   return (error: any) => {
-    if (matches(ignores, error[attribute])) return defaultValue;
+    // Support AggregateError or similar errors objects, which contains multiple errors.
+    const errors = Array.isArray(error?.errors) ? error.errors : [error];
+    if (errors.every((e: any) => matches(ignores, e[attribute]))) return defaultValue;
     throw error;
   };
 }

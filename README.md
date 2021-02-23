@@ -27,6 +27,9 @@ import { ignoreCode } from "ignor";
 // Async: Returns "default value" if thrown error code is "ECONNREFUSED", otherwise throws.
 await got(url).catch(ignoreCode("ECONNREFUSED", "default value"));
 
+// AggregateError: Returns "default value" if all errors of an aggregate error are ignored.
+await Promise.any([got(url), got(url)]).catch(ignoreCode("ECONNREFUSED", "default value"));
+
 // Sync: Returns "default value" if thrown error code is "ENOENT", otherwise throws.
 ignoreCode("ENOENT", "default value", () => readFileSync("x.txt"));
 ```
@@ -127,7 +130,7 @@ ignore.code(["ENOENT", "OTHER"], () => readFileSync("file.txt"));
 
 `undefined`.
 
-Defined in: [ignore.ts:20](https://github.com/ozum/ignor/blob/faaac87/src/ignore.ts#L20)
+Defined in: [ignore.ts:20](https://github.com/ozum/ignor/blob/ce0254b/src/ignore.ts#L20)
 
 ▸ **ignoreCode**<D, R\>(`ignore`: _Multi_<Ignore\> \| _undefined_, `defaultValue`: D, `fn`: (...`args`: _any_[]) => R): D \| R
 
@@ -162,7 +165,7 @@ ignore.code(["ENOENT", "OTHER"], "default", () => readFileSync("file.txt"));
 
 `undefined`.
 
-Defined in: [ignore.ts:39](https://github.com/ozum/ignor/blob/faaac87/src/ignore.ts#L39)
+Defined in: [ignore.ts:39](https://github.com/ozum/ignor/blob/ce0254b/src/ignore.ts#L39)
 
 ▸ **ignoreCode**(`ignore?`: _Multi_<Ignore\>): (`e`: Error) => _undefined_
 
@@ -188,7 +191,7 @@ await got(url).catch(ignore.code(["ECONNREFUSED", "OTHER"]));
 
 `undefined`.
 
-Defined in: [ignore.ts:53](https://github.com/ozum/ignor/blob/faaac87/src/ignore.ts#L53)
+Defined in: [ignore.ts:53](https://github.com/ozum/ignor/blob/ce0254b/src/ignore.ts#L53)
 
 ▸ **ignoreCode**<D\>(`ignore`: _Multi_<Ignore\> \| _undefined_, `defaultValue`: D): (`e`: Error) => D
 
@@ -221,7 +224,7 @@ await got(url).catch(ignore.code(["ECONNREFUSED", "OTHER"], []));
 
 default value.
 
-Defined in: [ignore.ts:70](https://github.com/ozum/ignor/blob/faaac87/src/ignore.ts#L70)
+Defined in: [ignore.ts:70](https://github.com/ozum/ignor/blob/ce0254b/src/ignore.ts#L70)
 
 ---
 
@@ -244,7 +247,7 @@ Defined in: [ignore.ts:70](https://github.com/ozum/ignor/blob/faaac87/src/ignore
 
 **Returns:** _undefined_ \| R
 
-Defined in: [ignore.ts:75](https://github.com/ozum/ignor/blob/faaac87/src/ignore.ts#L75)
+Defined in: [ignore.ts:75](https://github.com/ozum/ignor/blob/ce0254b/src/ignore.ts#L75)
 
 ▸ **ignoreMessage**<D, R\>(`ignore`: _Multi_<Ignore\> \| _undefined_, `defaultValue`: D, `fn`: (...`args`: _any_[]) => R): D \| R
 
@@ -265,7 +268,7 @@ Defined in: [ignore.ts:75](https://github.com/ozum/ignor/blob/faaac87/src/ignore
 
 **Returns:** D \| R
 
-Defined in: [ignore.ts:76](https://github.com/ozum/ignor/blob/faaac87/src/ignore.ts#L76)
+Defined in: [ignore.ts:76](https://github.com/ozum/ignor/blob/ce0254b/src/ignore.ts#L76)
 
 ▸ **ignoreMessage**(`ignore?`: _Multi_<Ignore\>): (`e`: Error) => _undefined_
 
@@ -277,7 +280,7 @@ Defined in: [ignore.ts:76](https://github.com/ozum/ignor/blob/faaac87/src/ignore
 
 **Returns:** _function_
 
-Defined in: [ignore.ts:77](https://github.com/ozum/ignor/blob/faaac87/src/ignore.ts#L77)
+Defined in: [ignore.ts:77](https://github.com/ozum/ignor/blob/ce0254b/src/ignore.ts#L77)
 
 ▸ **ignoreMessage**<D\>(`ignore`: _Multi_<Ignore\> \| _undefined_, `defaultValue`: D): (`e`: Error) => D
 
@@ -296,7 +299,7 @@ Defined in: [ignore.ts:77](https://github.com/ozum/ignor/blob/faaac87/src/ignore
 
 **Returns:** _function_
 
-Defined in: [ignore.ts:78](https://github.com/ozum/ignor/blob/faaac87/src/ignore.ts#L78)
+Defined in: [ignore.ts:78](https://github.com/ozum/ignor/blob/ce0254b/src/ignore.ts#L78)
 
 ---
 
@@ -319,7 +322,7 @@ Defined in: [ignore.ts:78](https://github.com/ozum/ignor/blob/faaac87/src/ignore
 
 **Returns:** _undefined_ \| R
 
-Defined in: [ignore.ts:83](https://github.com/ozum/ignor/blob/faaac87/src/ignore.ts#L83)
+Defined in: [ignore.ts:83](https://github.com/ozum/ignor/blob/ce0254b/src/ignore.ts#L83)
 
 ▸ **ignoreStatus**<D, R\>(`ignore`: _Multi_<Ignore\> \| _undefined_, `defaultValue`: D, `fn`: (...`args`: _any_[]) => R): D \| R
 
@@ -340,7 +343,7 @@ Defined in: [ignore.ts:83](https://github.com/ozum/ignor/blob/faaac87/src/ignore
 
 **Returns:** D \| R
 
-Defined in: [ignore.ts:84](https://github.com/ozum/ignor/blob/faaac87/src/ignore.ts#L84)
+Defined in: [ignore.ts:84](https://github.com/ozum/ignor/blob/ce0254b/src/ignore.ts#L84)
 
 ▸ **ignoreStatus**(`ignore?`: _Multi_<Ignore\>): (`e`: Error) => _undefined_
 
@@ -352,7 +355,7 @@ Defined in: [ignore.ts:84](https://github.com/ozum/ignor/blob/faaac87/src/ignore
 
 **Returns:** _function_
 
-Defined in: [ignore.ts:85](https://github.com/ozum/ignor/blob/faaac87/src/ignore.ts#L85)
+Defined in: [ignore.ts:85](https://github.com/ozum/ignor/blob/ce0254b/src/ignore.ts#L85)
 
 ▸ **ignoreStatus**<D\>(`ignore`: _Multi_<Ignore\> \| _undefined_, `defaultValue`: D): (`e`: Error) => D
 
@@ -371,4 +374,4 @@ Defined in: [ignore.ts:85](https://github.com/ozum/ignor/blob/faaac87/src/ignore
 
 **Returns:** _function_
 
-Defined in: [ignore.ts:86](https://github.com/ozum/ignor/blob/faaac87/src/ignore.ts#L86)
+Defined in: [ignore.ts:86](https://github.com/ozum/ignor/blob/ce0254b/src/ignore.ts#L86)

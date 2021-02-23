@@ -1,51 +1,63 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { ignoreCode, ignoreMessage, ignoreStatus } from "../src/index";
 
-const error: any = new Error("Cannot complete operation.");
-error.code = "CANNOT";
-error.status = 802;
+const ERROR: any = new Error("Cannot complete operation.");
+ERROR.code = "CANNOT";
+ERROR.status = 802;
 
-const simpleError: any = new Error("Cannot complete operation.");
+const AGGREGATE_ERROR: any = new Error("This is an aggregate error.");
+AGGREGATE_ERROR.errors = [ERROR, ERROR];
+
+const SIMPLE_ERROR: any = new Error("Cannot complete operation.");
 
 function throwing(): string {
-  throw error;
+  throw ERROR;
 }
 
 function throwingSimple(): string {
-  throw simpleError;
+  throw SIMPLE_ERROR;
 }
 
 describe("ignore", () => {
   describe("code", () => {
     it("should return undefined if ignored value is equal to error code.", async () => {
-      expect(await Promise.reject(error).catch(ignoreCode("CANNOT"))).toBe(undefined);
+      expect(await Promise.reject(ERROR).catch(ignoreCode("CANNOT"))).toBe(undefined);
     });
 
     it("should throw if ignored value is not equal to error code.", async () => {
-      await expect(Promise.reject(error).catch(ignoreCode("X"))).rejects.toThrow("Cannot");
+      await expect(Promise.reject(ERROR).catch(ignoreCode("X"))).rejects.toThrow("Cannot");
     });
 
     it("should return undefined if one of the ignored values is equal to error code.", async () => {
-      expect(await Promise.reject(error).catch(ignoreCode(["CANNOT", "EXTRA"]))).toBe(undefined);
+      expect(await Promise.reject(ERROR).catch(ignoreCode(["CANNOT", "EXTRA"]))).toBe(undefined);
     });
 
     it("should throw if none of the ignored values is equal to error code.", async () => {
-      await expect(Promise.reject(error).catch(ignoreCode(["X", "Y"]))).rejects.toThrow("Cannot");
+      await expect(Promise.reject(ERROR).catch(ignoreCode(["X", "Y"]))).rejects.toThrow("Cannot");
     });
 
     it("should throw if no ignore value is provided.", async () => {
-      await expect(Promise.reject(error).catch(ignoreCode())).rejects.toThrow("Cannot");
+      await expect(Promise.reject(ERROR).catch(ignoreCode())).rejects.toThrow("Cannot");
     });
 
     it("should throw if error does not have given attribute.", async () => {
-      await expect(Promise.reject(simpleError).catch(ignoreCode("CANNOT"))).rejects.toThrow("Cannot");
+      await expect(Promise.reject(SIMPLE_ERROR).catch(ignoreCode("CANNOT"))).rejects.toThrow("Cannot");
     });
 
     it("should return default value if ignored value is equal to error code.", async () => {
-      expect(await Promise.reject(error).catch(ignoreCode("CANNOT", "default"))).toBe("default");
+      expect(await Promise.reject(ERROR).catch(ignoreCode("CANNOT", "default"))).toBe("default");
     });
 
     it("should return default value if one of the ignored values is equal to error code.", async () => {
-      expect(await Promise.reject(error).catch(ignoreCode(["CANNOT", "EXTRA"], "default"))).toBe("default");
+      expect(await Promise.reject(ERROR).catch(ignoreCode(["CANNOT", "EXTRA"], "default"))).toBe("default");
+    });
+
+    it("should return default value if all errors of an aggregate error has one of the ignored codes.", async () => {
+      expect(await Promise.reject(AGGREGATE_ERROR).catch(ignoreCode("CANNOT", "default"))).toBe("default");
+    });
+
+    it("should throw if some errors of an aggregate error is not ignored.", async () => {
+      await expect(Promise.reject(AGGREGATE_ERROR).catch(ignoreCode("EXTRA", "default"))).rejects.toThrow("This is an aggregate error.");
     });
   });
 
@@ -85,37 +97,37 @@ describe("ignore", () => {
 
   describe("message", () => {
     it("should return undefined if ignored value matches to error message.", async () => {
-      expect(await Promise.reject(error).catch(ignoreMessage(/complete/))).toBe(undefined);
+      expect(await Promise.reject(ERROR).catch(ignoreMessage(/complete/))).toBe(undefined);
     });
 
     it("should return undefined if one of the ignored values matches to error message.", async () => {
-      expect(await Promise.reject(error).catch(ignoreMessage([/complete/, /extra/]))).toBe(undefined);
+      expect(await Promise.reject(ERROR).catch(ignoreMessage([/complete/, /extra/]))).toBe(undefined);
     });
 
     it("should return default value if ignored value matches to error message.", async () => {
-      expect(await Promise.reject(error).catch(ignoreMessage(/complete/, "default"))).toBe("default");
+      expect(await Promise.reject(ERROR).catch(ignoreMessage(/complete/, "default"))).toBe("default");
     });
 
     it("should return default value if one of the ignored values matches to error message.", async () => {
-      expect(await Promise.reject(error).catch(ignoreMessage([/complete/, /extra/], "default"))).toBe("default");
+      expect(await Promise.reject(ERROR).catch(ignoreMessage([/complete/, /extra/], "default"))).toBe("default");
     });
   });
 
   describe("status", () => {
     it("should return undefined if ignored value is equal to error status.", async () => {
-      expect(await Promise.reject(error).catch(ignoreStatus(802))).toBe(undefined);
+      expect(await Promise.reject(ERROR).catch(ignoreStatus(802))).toBe(undefined);
     });
 
     it("should return undefined if one of the ignored values is equal to error status.", async () => {
-      expect(await Promise.reject(error).catch(ignoreStatus([802, 803]))).toBe(undefined);
+      expect(await Promise.reject(ERROR).catch(ignoreStatus([802, 803]))).toBe(undefined);
     });
 
     it("should return default value if ignored value is equal to error status.", async () => {
-      expect(await Promise.reject(error).catch(ignoreStatus(802, "default"))).toBe("default");
+      expect(await Promise.reject(ERROR).catch(ignoreStatus(802, "default"))).toBe("default");
     });
 
     it("should return default value if one of the ignored values is equal to error status.", async () => {
-      expect(await Promise.reject(error).catch(ignoreStatus([802, 803], "default"))).toBe("default");
+      expect(await Promise.reject(ERROR).catch(ignoreStatus([802, 803], "default"))).toBe("default");
     });
   });
 });
